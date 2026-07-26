@@ -1,58 +1,87 @@
 # agent-builder-companion
 
-Welcome to your new [Mastra](https://mastra.ai) project! We're excited to see what you build.
+A Mastra-powered AI companion designed to help you learn how to build agents—with a special focus on neurodivergent-friendly design patterns.
 
-This starter provides you with a general-purpose Mastra agent that can research current information, manage multi-step tasks, work with local files, run approved shell commands, and create recurring schedules.
+## What This Project Does
 
-## Features
+This project gives you two distinct AI personalities:
 
-- A project-level `workspace/` for files and command execution
-- Approval gates for file changes, deletions, and shell commands
-- Conversation memory, generated thread titles, and task tracking
-- Google Gemini web search and direct web page fetching
-- Recurring schedules that persist across restarts
-- Local libSQL storage and DuckDB observability, with optional Turso storage
-- A bundled Mastra skill that helps coding agents use current Mastra APIs
+| Agent | Purpose |
+|-------|--------|
+| **Agent** (the generalist) | Research current topics, manage tasks, edit files in your workspace, run shell commands with approval gates, and create recurring schedules. |
+| **Workbook Mentor** (the teacher) | A structured-learning agent that teaches you the principles of building AI agents using narrative analogies, cognitive-load reduction, and zero-assumption explanations. |
 
-## Get started
+## Get Started
 
-Set your `GOOGLE_GENERATIVE_AI_API_KEY` in `.env` or in your environment, then run:
+1. Set your API key:
+   ```shell
+   export GOOGLE_GENERATIVE_AI_API_KEY="your-api-key"
+   # or put it in .env as GOOGLE_GENERATIVE_AI_API_KEY
+   ```
 
-```shell
-npm run dev
-```
+2. Run the development server:
+   ```shell
+   npm run dev
+   ```
 
-Open [http://localhost:4111](http://localhost:4111) in your browser to access [Mastra Studio](https://mastra.ai/docs/studio/overview).
+3. Open [http://localhost:4111](http://localhost:4111) to access Mastra Studio.
 
-Select **Agent** in Mastra Studio and try one of these prompts:
+4. In Mastra Studio, select **Agent** and try these prompts:
 
-- `Get the weather forecast for Austin this weekend.`
-- `Create a landing page for a Japanese sakura festival.`
-- `Check the SPCX stock price now, then check it every minute.`
+   - `Get the weather forecast for Austin this weekend.` → The agent checks live data.
+   - `Create a landing page for a Japanese sakura festival.` → It writes files in your workspace directory.
+   - `Check the SPCX stock price now, then check it every minute.` → You get a schedule ID you can pause later.
 
-The agent asks for approval before it changes files or runs commands. When it creates a schedule, it returns an ID that you can use to pause the schedule.
+## How The Generalist Agent Works
 
-## Workspace safety
+The general-purpose agent has these capabilities:
 
-The local filesystem tools stay inside the project-level `workspace/` directory. Shell commands start in that directory, but `LocalSandbox` does not provide operating-system isolation by default. Review command approvals carefully, and do not expose this template through an unauthenticated public server.
+- **Web tools**: Google search and direct web page fetching (via `webFetchTool`)
+- **Filesystem**: Read/write/delete files in the local `workspace/` directory with approval gates before destructive changes
+- **Shell sandbox**: Run commands inside a restricted working directory (`LocalSandbox`)
+- **Memory & tasks**: Persistent conversation memory, auto-generated thread titles, and task tracking using LibSQL + DuckDB
+- **Scheduling**: Create recurring schedules that run across restarts (using Mastra's built-in scheduler)
+- **Ask user**: A tool to ask the user a clarifying question before proceeding
 
-## Storage
+## How The Workbook Mentor Works
 
-The default `file:./mastra.db` database stores agent memory, tasks, and schedules locally. To use Turso, set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` in `.env`.
+The workbook mentor agent is built around four pedagogical rules from AGENTS.md:
 
-Recurring schedules continue to use model tokens until you pause them. Ask the agent to pause a schedule with the ID returned by `start_schedule`.
+1. **Narrative-first** – Every abstract concept gets a physical analogy before any code appears.
+2. **Neurodivergent-first** – Cognitive load is minimized; instructions enforce single-tasking and provide clear verbal structure.
+3. **Backwards design** – You see the final, working result first (the running agent), then trace backward to build it.
+4. **The Blind Man's Test** – Zero assumptions about prior knowledge. Every tool is defined before use.
 
-## Making it yours
+The mentor uses LibSQL for its own memory store and a separate vector database for semantic recall during lessons.
 
-- Edit `src/mastra/agents/agent.ts` to change the model, instructions, memory, workspace, or approval policy.
-- Edit `src/mastra/tools/` to customize web fetching and scheduling.
-- Edit `src/mastra/index.ts` to change storage and observability.
-- Add files or reusable skills under `workspace/` for the agent to use.
+## Safety & Environment
 
-## Learn more
+- All file operations stay inside the `workspace/` directory (configurable in `src/mastra/agents/agent.ts`).
+- Shell commands start from that same directory, but there is **no process isolation** – review every approval before running unknown commands.
+- The default database is `file:./mastra.db`. To use Turso Cloud, set:
+  ```env
+  TURSO_DATABASE_URL="turso://..."
+  TURSO_AUTH_TOKEN="your-token"
+  ```
 
-To learn more about Mastra, visit our [documentation](https://mastra.ai/docs/). If you're new to AI agents, check out our [course](https://mastra.ai/learn) and [YouTube videos](https://youtube.com/@mastra-ai). You can also join our [Discord](https://discord.gg/BTYqqHKUrf) community to get help and share your projects.
+## Customizing The Project
 
-## Deploy to the Mastra platform
+Edit these files to change behavior:
 
-The [Mastra platform](https://projects.mastra.ai) provides two products for deploying and managing AI applications built with the Mastra framework. Learn more in the [Mastra platform documentation](https://mastra.ai/docs/mastra-platform/overview).
+| File | What It Controls |
+|------|------------------|
+| `src/mastra/index.ts` | Register agents, tools, storage (LibSQL → Turso), and observability exporters |
+| `src/mastra/agents/agent.ts` | Change the generalist agent's model, instructions, memory config, workspace path, and approval policies |
+| `src/mastra/tools/web-fetch-tool.ts` | Customize how web pages are fetched (headers, timeouts, error handling) |
+| `src/mastra/tools/schedule-tools.ts` | Modify cron expressions or prompt templates for scheduling |
+| `src/mastra/agents/workbook-mentor/*.ts` | Adjust the mentor's system prompts, constitution rules, and activation messages |
+
+## Learn More
+
+- [Mastra Documentation](https://mastra.ai/docs) – Framework APIs, tool creation, workspace patterns
+- [Mastra Studio Tour](https://mastra.ai/learn/studio-tour) – How to use the GUI for testing agents
+- AGENTS.md in this repo – The pedagogical philosophy behind the workbook mentor
+
+## Deploy To The Mastra Platform
+
+The [Mastra platform](https://projects.mastra.ai) provides hosting, monitoring, and deployment for agent applications. Read more in the [platform documentation](https://mastra.ai/docs/mastra-platform).
