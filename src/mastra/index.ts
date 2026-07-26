@@ -1,5 +1,5 @@
 import { Mastra } from '@mastra/core/mastra';
-import { LibSQLStore } from '@mastra/libsql';
+import { LibSQLStore, LibSQLVector } from '@mastra/libsql';
 import { DuckDBStore } from '@mastra/duckdb';
 import { MastraCompositeStore } from '@mastra/core/storage';
 import {
@@ -9,11 +9,12 @@ import {
   SensitiveDataFilter,
 } from '@mastra/observability';
 import { agent } from './agents/agent';
+import { workbookMentorAgent } from './agents/workbook-mentor';
 import { startScheduleTool, stopScheduleTool } from './tools/schedule-tools';
 import { webFetchTool } from './tools/web-fetch-tool';
 
 export const mastra = new Mastra({
-  agents: { agent },
+  agents: { agent, workbookMentorAgent },
   tools: { startScheduleTool, stopScheduleTool, webFetchTool },
   storage: new MastraCompositeStore({
     id: 'composite-storage',
@@ -36,3 +37,5 @@ export const mastra = new Mastra({
     },
   }),
 });
+
+export default mastra;

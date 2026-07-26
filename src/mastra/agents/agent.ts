@@ -6,6 +6,8 @@ import { TaskSignalProvider } from '@mastra/core/signals';
 import { askUserTool } from '@mastra/core/tools';
 import { LocalFilesystem, LocalSandbox, WORKSPACE_TOOLS, Workspace } from '@mastra/core/workspace';
 import { Memory } from '@mastra/memory';
+import { LibSQLStore, LibSQLVector } from '@mastra/libsql';
+import { ModelRouterEmbeddingModel } from '@mastra/core/llm';
 
 import { webFetchTool } from '../tools/web-fetch-tool';
 import { startScheduleTool, stopScheduleTool } from '../tools/schedule-tools';
@@ -55,7 +57,19 @@ For local file changes, end with a plain-text URL using ${pathToFileURL(`${works
     autoResumeSuspendedTools: true,
   },
   memory: new Memory({
+    storage: new LibSQLStore({
+      id: 'agent-storage',
+      url: process.env.TURSO_DATABASE_URL || 'file:./mastra.db',
+      authToken: process.env.TURSO_AUTH_TOKEN || undefined,
+    }),
+    vector: new LibSQLVector({
+      id: 'agent-vector',
+      url: process.env.TURSO_DATABASE_URL || 'file:./mastra.db',
+      authToken: process.env.TURSO_AUTH_TOKEN || undefined,
+    }),
+    embedder: new ModelRouterEmbeddingModel('google/embedding-001'),
     options: {
+      semanticRecall: true,
       generateTitle: true,
       observationalMemory: {
         model: 'google/gemini-3.5-flash',
