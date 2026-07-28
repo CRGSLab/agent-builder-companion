@@ -51,3 +51,7 @@ export const ACTIVATION_SUMMARY_MAX_TOKENS = {
   observation: OBSERVATION_TOKEN_LIMIT,
   reflection: REFLECTION_OBSERVATION_TOKENS,
 };
+
+// Default export for Mastra's agent registry - create an object and export it properly
+const config = { AGENT_ID, AGENT_NAME, DEFAULT_MODEL, MEMORY_MESSAGE_LIMIT, WORKBOOK_STORAGE_ID, WORKBOOK_VECTOR_ID, DEFAULT_DB_URL, DEFAULT_AUTH_TOKEN, MemoryKind, ACTIVATION_SUMMARY_MAX_TOKENS };
+export default config;
