@@ -1,5 +1,7 @@
 # agent-builder-companion
 
+[About Corey Alejandro and the connected GitHub accounts](COREY_ALEJANDRO.md) · [Experience the practice](https://corey-alejandro-work-in-motion.coreyalejandro.chatgpt.site)
+
 A Mastra-powered AI companion designed to help you learn how to build agents—with a special focus on neurodivergent-friendly design patterns.
 
 ## What This Project Does
